@@ -1,20 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ColliderScript : MonoBehaviour {
 
-    public bool exit;
-    private void Start()
+
+    public bool hit;
+    void Start()
     {
-        exit = false;
+        Debug.Log("initiating the colliders. . . ");
+        hit = false;
     }
-    private void OnTriggerExit(Collider other)
+    void Update()
     {
-        exit = true;
+
     }
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        exit = false;
+        Debug.Log("HIT : " + other.tag);
+        Debug.Log("hitting started ");
+    }
+    void OnTriggerStay(Collider other)
+    {
+        Debug.Log("HIT : " + other.tag);
+        hit = true;
+    }
+    void OnTriggerExit(Collider other)
+    {
+        Debug.Log("hitting ended");
+        hit = false;
     }
 }
