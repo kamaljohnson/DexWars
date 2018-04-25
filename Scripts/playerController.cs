@@ -16,22 +16,25 @@ public class playerController : MonoBehaviour {
 
     //components for the player rotaration (the ground trigger items)
     //all the colliders are set to isTrigger
-    public GameObject rightCollider;
-    public GameObject leftCollider;
-    public GameObject forwardCollider;
-    public GameObject backCollider;
+    public GameObject Right;
+    public GameObject Left;
+    public GameObject Forward;
+    public GameObject Back;
 
-    ColliderScript rightcol;
-    ColliderScript leftcol;
-    ColliderScript forwardcol;
-    ColliderScript backcol;
+    RayCastScript rightRay;
+    RayCastScript leftRay;
+    RayCastScript forwardRay;
+    RayCastScript backRay;
 
-    bool canMoveRight;
-    bool canMoveLeft;
-    bool canMoveForward;
-    bool canMoveBack;
+    bool canMoveRight = false;
+    bool canMoveLeft = false;
+    bool canMoveForward = false;
+    bool canMoveBack = false;
+
+    bool isMoving;
 
     float stepOffSet = 1f;   //the distance between each step (start and the end)
+    float DownStep;
 
     private float playerMeshSize = 0.25f;
 
@@ -47,7 +50,7 @@ public class playerController : MonoBehaviour {
         Back
     };
     //all the variables to controll the player 
-    private float playerSpeed = 0.01f;   //the speed of the player also manipulates the animation speed of the player 
+    private float playerSpeed = 0.02f;   //the speed of the player also manipulates the animation speed of the player 
     private bool atEdge;    //to check if the player reached the edge of the maze(to trigger the camera movement and the player rotation)
     private Direction movementDireciton;
 
@@ -59,17 +62,24 @@ public class playerController : MonoBehaviour {
     Vector3 localBack;
     Vector3 localDown;
 
+    Vector3 RightRotation;
+    Vector3 LeftRotation;
+    Vector3 ForwardRotation;
+    Vector3 BackRotation;
+
     Vector3 destination = new Vector3();
     bool destinationFlag = false;
     Vector3 preDestination = new Vector3();
 
 
     private void Start () {
-        
-        rightcol = rightCollider.GetComponent<ColliderScript>();
-        leftcol = leftCollider.GetComponent<ColliderScript>();
-        forwardcol = forwardCollider.GetComponent<ColliderScript>();
-        backcol = backCollider.GetComponent<ColliderScript>();
+
+        isMoving = false;
+
+        rightRay = Right.GetComponent<RayCastScript>();
+        leftRay = Left.GetComponent<RayCastScript>();
+        forwardRay = Forward.GetComponent<RayCastScript>();
+        backRay = Back.GetComponent<RayCastScript>();
 
         trigFlag = false;
         rotateFlag = false;
@@ -77,17 +87,21 @@ public class playerController : MonoBehaviour {
         destinationFlag = true;
         destination = transform.localPosition;
         preDestination = transform.localPosition;
-        MazeOffset = MazeSize/2 - MazeSize/8 + playerMeshSize * 3 / 2;
+
+        MazeOffset = MazeSize / 2;
+        DownStep = MazeOffset / 4;
         Debug.Log(MazeOffset);
+
     }
 	
 	private void FixedUpdate ()
     {
         WallCollisionCheck();
-        Debug.Log("CanMoveRight  : " + canMoveRight);
-        Debug.Log("CanMoveLeft  : " + canMoveLeft);
-        Debug.Log("CanMoveForward  : " + canMoveForward);
-        Debug.Log("CanMoveBack  : " + canMoveBack);
+        EdgeDetection();
+        //Debug.Log("CanMoveRight  : " + canMoveRight);
+        //Debug.Log("CanMoveLeft  : " + canMoveLeft);
+        //Debug.Log("CanMoveForward  : " + canMoveForward);
+        //Debug.Log("CanMoveBack  : " + canMoveBack);
 
         localForward = transform.parent.InverseTransformDirection(transform.forward);
         localRight = transform.parent.InverseTransformDirection(transform.right);
@@ -95,23 +109,28 @@ public class playerController : MonoBehaviour {
         localBack = localForward * -1;
         localDown = transform.parent.InverseTransformDirection(transform.up) * -1;
 
+        RightRotation = localBack;
+        LeftRotation = localForward;
+        ForwardRotation = localRight;
+        BackRotation = localLeft;
+
         if (!atEdge)
         {
             Move();
         }
-        if(atEdge && !rotateFlag)
+        if(atEdge)
         {
-            rotateFlag = true;
             ChangePlane();
             RotateCamera();
+            Debug.Log("changing plane");
         }
-
+               
     }
 
     void Move() //controls the movement of the player 
     {
-        Debug.Log(destinationFlag);
-        if (Input.GetAxis("Horizontal") > 0)
+        //Debug.Log(destinationFlag);
+        if (Input.GetAxis("Horizontal") > 0 && !isMoving)
         {
             if (canMoveRight)
             {
@@ -119,11 +138,15 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Left)
                     {
+                        isMoving = true;
+                        Vector3 temp = destination;
                         destination = preDestination;
+                        preDestination = temp;
                     }
                 }
                 else
                 {
+                    isMoving = true;
                     destinationFlag = false;
                     movementDireciton = Direction.Right;
                     preDestination = transform.localPosition;
@@ -131,7 +154,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Horizontal") < 0) 
+        else if(Input.GetAxis("Horizontal") < 0 && !isMoving)
         {
             if (canMoveLeft)
             {
@@ -139,12 +162,15 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Right)
                     {
-                        destinationFlag = false;
+                        isMoving = true;
+                        Vector3 temp = destination;
                         destination = preDestination;
+                        preDestination = temp;
                     }
                 }
                 else
                 {
+                    isMoving = true;
                     destinationFlag = false;
                     movementDireciton = Direction.Left;
                     preDestination = transform.localPosition;
@@ -152,7 +178,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Vertical") > 0)
+        else if(Input.GetAxis("Vertical") > 0 && !isMoving)
         {
             if (canMoveForward)
             {
@@ -160,12 +186,15 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Back)
                     {
-                        destinationFlag = false;
+                        isMoving = true;
+                        Vector3 temp = destination;
                         destination = preDestination;
+                        preDestination = temp;
                     }
                 }
                 else
                 {
+                    isMoving = true;
                     destinationFlag = false;
                     movementDireciton = Direction.Forward;
                     preDestination = transform.localPosition;
@@ -173,7 +202,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Vertical") < 0)
+        else if(Input.GetAxis("Vertical") < 0 && !isMoving)
         {
             if (canMoveBack)
             {
@@ -181,8 +210,10 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Forward)
                     {
-                        destinationFlag = false;
+                        Vector3 temp = destination;
                         destination = preDestination;
+                        preDestination = temp;
+                        isMoving = true;
                     }
                 }
                 else
@@ -191,20 +222,25 @@ public class playerController : MonoBehaviour {
                     movementDireciton = Direction.Back;
                     preDestination = transform.localPosition;
                     destination = transform.localPosition + localBack * stepOffSet;
+                    isMoving = true;
                 }
             }
         }
-        if(transform.localPosition == destination)
+        if (transform.localPosition == destination)
         {
             preDestination = destination;
             movementDireciton = Direction.Null;
             destinationFlag = true;
+            isMoving = false;
         }
-        transform.localPosition = Vector3.MoveTowards(transform.localPosition, destination, playerSpeed);
+        else
+        {
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, destination, playerSpeed);
+        }
     }
     void WallCollisionCheck()
     {
-        if(rightcol.hit)
+        if(rightRay.hittingWall)
         {
             canMoveRight = false;
         }
@@ -213,7 +249,7 @@ public class playerController : MonoBehaviour {
             canMoveRight = true;
         }
 
-        if (leftcol.hit)
+        if (leftRay.hittingWall)
         {
             canMoveLeft = false;
         }
@@ -222,7 +258,7 @@ public class playerController : MonoBehaviour {
             canMoveLeft = true;
         }
 
-        if (forwardcol.hit)
+        if (forwardRay.hittingWall)
         {
             canMoveForward = false;
         }
@@ -231,7 +267,7 @@ public class playerController : MonoBehaviour {
             canMoveForward = true;
         }
 
-        if (backcol.hit)
+        if (backRay.hittingWall)
         {
             canMoveBack = false;
         }
@@ -241,11 +277,86 @@ public class playerController : MonoBehaviour {
         }
 
     }
+    void EdgeDetection()
+    {
+        if(transform.localPosition.x > MazeOffset + 0.05)
+        {
+            atEdge = true;
+            transform.localPosition = new Vector3(MazeOffset, transform.localPosition.y, transform.localPosition.z);
+        }
+        else if (transform.localPosition.y > MazeOffset + 0.05)
+        {
+            atEdge = true;
+            transform.localPosition = new Vector3(transform.localPosition.x, MazeOffset, transform.localPosition.z);
+        }
+        else if (transform.localPosition.z > MazeOffset + 0.05)
+        {
+            atEdge = true;
+            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, MazeOffset);
+        }
+        else if (transform.localPosition.x < -(MazeOffset + 0.05))
+        {
+            atEdge = true;
+            transform.localPosition = new Vector3(-MazeOffset, transform.localPosition.y, transform.localPosition.z);
+        }
+        else if (transform.localPosition.y < -(MazeOffset + 0.05))
+        {
+            atEdge = true;
+            transform.localPosition = new Vector3(transform.localPosition.x, -MazeOffset, transform.localPosition.z);
+        }
+        else if (transform.localPosition.z < -(MazeOffset + 0.05))
+        {
+            atEdge = true;
+            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -MazeOffset);
+        }
+
+
+    }
     void ChangePlane()
     {
-        Debug.Log("Changing plane");
+        //Debug.Log("Changing plane");
+        if (!rotateFlag)
+        {
+            //change the position of the player
+            preDestination = transform.localPosition;
+            destination = transform.localPosition + localDown * DownStep;
+
+
+            //rotate the player by 90 Degree
+            PlayerRotate();
+
+            //change the position of the camera 
+            ChangeCameraPosition();
+
+            //rotate the camera
+            rotateFlag = true;
+        } 
+        transform.localPosition = Vector3.MoveTowards(transform.localPosition, destination, playerSpeed);
+        if(transform.localPosition == destination)
+        {
+            atEdge = false;
+            rotateFlag = false;
+        }
+    }
+    void PlayerRotate()
+    {
+        for(int i = 0; i < 90; i++)
+        {
+            if (movementDireciton == Direction.Right)
+            { transform.Rotate(RightRotation); }
+            else if (movementDireciton == Direction.Left)
+            { transform.Rotate(LeftRotation); }
+            else if (movementDireciton == Direction.Forward)
+            { transform.Rotate(ForwardRotation); }
+            else if (movementDireciton == Direction.Back)
+            { transform.Rotate(BackRotation); }
+        }
     }
     void RotateCamera()
+    {
+
+    }
+    void ChangeCameraPosition()
     {
 
     }
