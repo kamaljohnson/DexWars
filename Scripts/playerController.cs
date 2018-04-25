@@ -343,22 +343,18 @@ public class playerController : MonoBehaviour {
         {
             if (movementDireciton == Direction.Right)
             {
-                Debug.Log("rotating right");
                 transform.Rotate(RightRotation);
             }
             else if (movementDireciton == Direction.Left)
             {
-                Debug.Log("rotating left");
                 transform.Rotate(LeftRotation);
             }
             else if (movementDireciton == Direction.Forward)
             {
-                Debug.Log("rotating forward");
                 transform.Rotate(ForwardRotation);
             }
             else if (movementDireciton == Direction.Back)
             {
-                Debug.Log("rotating back");
                 transform.Rotate(BackRotation);
             }
         }

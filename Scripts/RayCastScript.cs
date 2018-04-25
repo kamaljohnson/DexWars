@@ -55,7 +55,7 @@ public class RayCastScript : MonoBehaviour {
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.TransformDirection(localDirection), out hit, 0.50f))
+        if (Physics.Raycast(transform.position, transform.TransformDirection(localDirection), out hit, 0.30f))
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(localDirection) * hit.distance, Color.red);
             hittingWall = true;
@@ -63,7 +63,7 @@ public class RayCastScript : MonoBehaviour {
         else
         {
             hittingWall = false;
-            Debug.DrawRay(transform.position, transform.TransformDirection(localDirection) * .5f, Color.white);
+            Debug.DrawRay(transform.position, transform.TransformDirection(localDirection) * .3f, Color.white);
         }
 
     }
