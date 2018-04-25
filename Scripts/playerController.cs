@@ -81,6 +81,11 @@ public class playerController : MonoBehaviour {
         forwardRay = Forward.GetComponent<RayCastScript>();
         backRay = Back.GetComponent<RayCastScript>();
 
+        RightRotation = Vector3.back;
+        LeftRotation = Vector3.forward;
+        ForwardRotation = Vector3.right;
+        BackRotation = Vector3.left;
+
         trigFlag = false;
         rotateFlag = false;
         atEdge = false;
@@ -90,7 +95,7 @@ public class playerController : MonoBehaviour {
 
         MazeOffset = MazeSize / 2;
         DownStep = MazeOffset / 4;
-        Debug.Log(MazeOffset);
+    
 
     }
 	
@@ -98,10 +103,6 @@ public class playerController : MonoBehaviour {
     {
         WallCollisionCheck();
         EdgeDetection();
-        //Debug.Log("CanMoveRight  : " + canMoveRight);
-        //Debug.Log("CanMoveLeft  : " + canMoveLeft);
-        //Debug.Log("CanMoveForward  : " + canMoveForward);
-        //Debug.Log("CanMoveBack  : " + canMoveBack);
 
         localForward = transform.parent.InverseTransformDirection(transform.forward);
         localRight = transform.parent.InverseTransformDirection(transform.right);
@@ -109,10 +110,6 @@ public class playerController : MonoBehaviour {
         localBack = localForward * -1;
         localDown = transform.parent.InverseTransformDirection(transform.up) * -1;
 
-        RightRotation = localBack;
-        LeftRotation = localForward;
-        ForwardRotation = localRight;
-        BackRotation = localLeft;
 
         if (!atEdge)
         {
@@ -120,6 +117,7 @@ public class playerController : MonoBehaviour {
         }
         if(atEdge)
         {
+
             ChangePlane();
             RotateCamera();
             Debug.Log("changing plane");
@@ -340,16 +338,29 @@ public class playerController : MonoBehaviour {
     }
     void PlayerRotate()
     {
-        for(int i = 0; i < 90; i++)
+
+        for (int i = 0; i < 90; i++)
         {
             if (movementDireciton == Direction.Right)
-            { transform.Rotate(RightRotation); }
+            {
+                Debug.Log("rotating right");
+                transform.Rotate(RightRotation);
+            }
             else if (movementDireciton == Direction.Left)
-            { transform.Rotate(LeftRotation); }
+            {
+                Debug.Log("rotating left");
+                transform.Rotate(LeftRotation);
+            }
             else if (movementDireciton == Direction.Forward)
-            { transform.Rotate(ForwardRotation); }
+            {
+                Debug.Log("rotating forward");
+                transform.Rotate(ForwardRotation);
+            }
             else if (movementDireciton == Direction.Back)
-            { transform.Rotate(BackRotation); }
+            {
+                Debug.Log("rotating back");
+                transform.Rotate(BackRotation);
+            }
         }
     }
     void RotateCamera()
