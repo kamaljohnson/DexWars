@@ -120,7 +120,6 @@ public class playerController : MonoBehaviour {
         {
 
             ChangePlane();
-            Debug.Log("changing plane");
         }
                
     }
@@ -157,9 +156,9 @@ public class playerController : MonoBehaviour {
     }
     void Move() //controls the movement of the player 
     {
-        Debug.Log("tempDirection : " + tempDirection);
-        if (Input.GetAxis("Horizontal") > 0 || movementDireciton == Direction.Right || tempDirection == Direction.Right)
+        if (Input.GetAxis("Horizontal") > 0|| tempDirection == Direction.Right)
         {
+            Debug.Log("Right");
             if (canMoveRight)
             {
                 tempDirection = Direction.Right;
@@ -172,8 +171,9 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        if(Input.GetAxis("Horizontal") < 0 || movementDireciton == Direction.Left || tempDirection == Direction.Left)
+        if(Input.GetAxis("Horizontal") < 0 || tempDirection == Direction.Left)
         {
+            Debug.Log("Left");
             if (canMoveLeft)
             {
                 tempDirection = Direction.Left;
@@ -186,8 +186,9 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        if(Input.GetAxis("Vertical") > 0 || movementDireciton == Direction.Forward || tempDirection == Direction.Forward)
+        if(Input.GetAxis("Vertical") > 0 || tempDirection == Direction.Forward)
         {
+            Debug.Log("Forward");
             if (canMoveForward)
             {
                 tempDirection = Direction.Forward;
@@ -202,6 +203,7 @@ public class playerController : MonoBehaviour {
         }
         if(Input.GetAxis("Vertical") < 0 || movementDireciton == Direction.Back || tempDirection == Direction.Back)
         {
+            Debug.Log("Back");
             if (canMoveBack)
             {
                 tempDirection = Direction.Back;
@@ -308,17 +310,12 @@ public class playerController : MonoBehaviour {
         //Debug.Log("Changing plane");
         if (!rotateFlag)
         {
-            //change the position of the player
             destination = transform.localPosition + localDown * DownStep;
 
-
-            //rotate the player by 90 Degree
             PlayerRotate();
 
-            //change the position of the camera 
             ChangeCameraPosition();
 
-            //rotate the camera
             rotateFlag = true;
         } 
         transform.localPosition = Vector3.MoveTowards(transform.localPosition, destination, playerSpeed);
