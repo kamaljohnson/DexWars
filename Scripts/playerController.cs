@@ -53,6 +53,7 @@ public class playerController : MonoBehaviour {
         Forward,
         Back
     };
+    Direction tempDirection;
     //all the variables to controll the player 
     private float playerSpeed = 0.05f;   //the speed of the player also manipulates the animation speed of the player 
     private bool atEdge;    //to check if the player reached the edge of the maze(to trigger the camera movement and the player rotation)
@@ -73,8 +74,6 @@ public class playerController : MonoBehaviour {
 
     Vector3 destination = new Vector3();
     bool destinationFlag = false;
-    Vector3 preDestination = new Vector3();
-
 
     private void Start () {
 
@@ -95,7 +94,6 @@ public class playerController : MonoBehaviour {
         atEdge = false;
         destinationFlag = true;
         destination = transform.localPosition;
-        preDestination = transform.localPosition;
 
         MazeOffset = MazeSize / 2;
         DownStep = MazeOffset / 4;
@@ -159,117 +157,72 @@ public class playerController : MonoBehaviour {
     }
     void Move() //controls the movement of the player 
     {
-        //Debug.Log(destinationFlag);
-        if ((Input.GetAxis("Horizontal") > 0 && !isMoving) || movementDireciton == Direction.Right)
+        Debug.Log("tempDirection : " + tempDirection);
+        if (Input.GetAxis("Horizontal") > 0 || movementDireciton == Direction.Right || tempDirection == Direction.Right)
         {
             if (canMoveRight)
             {
-                if (!destinationFlag)
-                {
-                    if (movementDireciton == Direction.Left)
-                    {
-                        Debug.Log("moving Back");
-                        isMoving = true;
-                        Vector3 temp = destination;
-                        destination = preDestination;
-                        preDestination = temp;
-                    }
-                }
-                else
+                tempDirection = Direction.Right;
+                if (destinationFlag)
                 {
                     isMoving = true;
                     destinationFlag = false;
                     movementDireciton = Direction.Right;
-                    preDestination = transform.localPosition;
                     destination = transform.localPosition + localRight * stepOffSet;
                 }
             }
         }
-        else if((Input.GetAxis("Horizontal") < 0 && !isMoving) || movementDireciton == Direction.Left)
+        if(Input.GetAxis("Horizontal") < 0 || movementDireciton == Direction.Left || tempDirection == Direction.Left)
         {
             if (canMoveLeft)
             {
-                if (!destinationFlag)
-                {
-                    if (movementDireciton == Direction.Right)
-                    {
-                        Debug.Log("moving Back");
-                        isMoving = true;
-                        Vector3 temp = destination;
-                        destination = preDestination;
-                        preDestination = temp;
-                    }
-                }
-                else
+                tempDirection = Direction.Left;
+                if (destinationFlag)
                 {
                     isMoving = true;
                     destinationFlag = false;
                     movementDireciton = Direction.Left;
-                    preDestination = transform.localPosition;
                     destination = transform.localPosition + localLeft * stepOffSet;
                 }
             }
         }
-        else if((Input.GetAxis("Vertical") > 0 && !isMoving )|| movementDireciton == Direction.Forward)
+        if(Input.GetAxis("Vertical") > 0 || movementDireciton == Direction.Forward || tempDirection == Direction.Forward)
         {
             if (canMoveForward)
             {
-                if (!destinationFlag)
-                {
-                    if (movementDireciton == Direction.Back)
-                    {
-                        Debug.Log("moving Back");
-                        isMoving = true;
-                        Vector3 temp = destination;
-                        destination = preDestination;
-                        preDestination = temp;
-                    }
-                }
-                else
+                tempDirection = Direction.Forward;
+                if (destinationFlag)
                 {
                     isMoving = true;
                     destinationFlag = false;
                     movementDireciton = Direction.Forward;
-                    preDestination = transform.localPosition;
                     destination = transform.localPosition + localForward * stepOffSet;
                 }
             }
         }
-        else if((Input.GetAxis("Vertical") < 0 && !isMoving )|| movementDireciton == Direction.Back)
+        if(Input.GetAxis("Vertical") < 0 || movementDireciton == Direction.Back || tempDirection == Direction.Back)
         {
             if (canMoveBack)
             {
-                if (!destinationFlag)
+                tempDirection = Direction.Back;
+                if (destinationFlag)
                 {
-                    if (movementDireciton == Direction.Forward)
-                    {
-                        Debug.Log("moving Back");
-                        Vector3 temp = destination;
-                        destination = preDestination;
-                        preDestination = temp;
-                        isMoving = true;
-                    }
-                }
-                else
-                {
+                    isMoving = true;
                     destinationFlag = false;
                     movementDireciton = Direction.Back;
-                    preDestination = transform.localPosition;
                     destination = transform.localPosition + localBack * stepOffSet;
-                    isMoving = true;
                 }
             }
         }
         if (transform.localPosition == destination)
         {
+            destinationFlag = true;
             if (inJunction)
             {
-                preDestination = destination;
+                tempDirection = Direction.Null;
                 movementDireciton = Direction.Null;
                 isMoving = false;
-                Debug.Log("at juntion");
             }
-            destinationFlag = true;
         }
         else if(!mazeRotation.rotate)
         {
@@ -356,7 +309,6 @@ public class playerController : MonoBehaviour {
         if (!rotateFlag)
         {
             //change the position of the player
-            preDestination = transform.localPosition;
             destination = transform.localPosition + localDown * DownStep;
 
 
