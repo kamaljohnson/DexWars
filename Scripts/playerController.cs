@@ -136,6 +136,22 @@ public class playerController : MonoBehaviour {
         {
             inJunction = true;
         }
+        else if(movementDireciton == Direction.Right && !canMoveRight)
+        {
+            inJunction = true;
+        }
+        else if (movementDireciton == Direction.Left && !canMoveLeft)
+        {
+            inJunction = true;
+        }
+        else if (movementDireciton == Direction.Forward && !canMoveForward)
+        {
+            inJunction = true;
+        }
+        else if (movementDireciton == Direction.Back && !canMoveBack)
+        {
+            inJunction = true;
+        }
         else
         {
             inJunction = false;
@@ -144,7 +160,7 @@ public class playerController : MonoBehaviour {
     void Move() //controls the movement of the player 
     {
         //Debug.Log(destinationFlag);
-        if (Input.GetAxis("Horizontal") > 0 && !isMoving || movementDireciton == Direction.Right)
+        if ((Input.GetAxis("Horizontal") > 0 && !isMoving) || movementDireciton == Direction.Right)
         {
             if (canMoveRight)
             {
@@ -152,6 +168,7 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Left)
                     {
+                        Debug.Log("moving Back");
                         isMoving = true;
                         Vector3 temp = destination;
                         destination = preDestination;
@@ -168,7 +185,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Horizontal") < 0 && !isMoving || movementDireciton == Direction.Left)
+        else if((Input.GetAxis("Horizontal") < 0 && !isMoving) || movementDireciton == Direction.Left)
         {
             if (canMoveLeft)
             {
@@ -176,6 +193,7 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Right)
                     {
+                        Debug.Log("moving Back");
                         isMoving = true;
                         Vector3 temp = destination;
                         destination = preDestination;
@@ -192,7 +210,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Vertical") > 0 && !isMoving || movementDireciton == Direction.Forward)
+        else if((Input.GetAxis("Vertical") > 0 && !isMoving )|| movementDireciton == Direction.Forward)
         {
             if (canMoveForward)
             {
@@ -200,6 +218,7 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Back)
                     {
+                        Debug.Log("moving Back");
                         isMoving = true;
                         Vector3 temp = destination;
                         destination = preDestination;
@@ -216,7 +235,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Vertical") < 0 && !isMoving || movementDireciton == Direction.Back)
+        else if((Input.GetAxis("Vertical") < 0 && !isMoving )|| movementDireciton == Direction.Back)
         {
             if (canMoveBack)
             {
@@ -224,6 +243,7 @@ public class playerController : MonoBehaviour {
                 {
                     if (movementDireciton == Direction.Forward)
                     {
+                        Debug.Log("moving Back");
                         Vector3 temp = destination;
                         destination = preDestination;
                         preDestination = temp;
@@ -242,9 +262,9 @@ public class playerController : MonoBehaviour {
         }
         if (transform.localPosition == destination)
         {
-            preDestination = destination;
             if (inJunction)
             {
+                preDestination = destination;
                 movementDireciton = Direction.Null;
                 isMoving = false;
                 Debug.Log("at juntion");
