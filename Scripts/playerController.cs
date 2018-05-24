@@ -107,7 +107,7 @@ public class playerController : MonoBehaviour {
     {
         WallCollisionCheck();
         EdgeDetection();
-
+        JunctionDetection();
         localForward = transform.parent.InverseTransformDirection(transform.forward);
         localRight = transform.parent.InverseTransformDirection(transform.right);
         localLeft = localRight * -1;
@@ -126,7 +126,21 @@ public class playerController : MonoBehaviour {
         }
                
     }
-
+    void JunctionDetection()
+    {
+        if ((movementDireciton == Direction.Right || movementDireciton == Direction.Left) && (canMoveForward || canMoveBack))
+        {
+            inJunction = true;
+        }
+        else if ((movementDireciton == Direction.Forward || movementDireciton == Direction.Back) && (canMoveRight || canMoveLeft))
+        {
+            inJunction = true;
+        }
+        else
+        {
+            inJunction = false;
+        }
+    }
     void Move() //controls the movement of the player 
     {
         //Debug.Log(destinationFlag);
@@ -229,9 +243,13 @@ public class playerController : MonoBehaviour {
         if (transform.localPosition == destination)
         {
             preDestination = destination;
-            movementDireciton = Direction.Null;
+            if (inJunction)
+            {
+                movementDireciton = Direction.Null;
+                isMoving = false;
+                Debug.Log("at juntion");
+            }
             destinationFlag = true;
-            isMoving = false;
         }
         else if(!mazeRotation.rotate)
         {
