@@ -3,7 +3,7 @@
 /*
  * 1. script to direct the camara to move (HINT make the camara move over to the corners of am imaginary cube over the main maze cube)
  * 2. move the camera to the next position by using the direction of movement of the player and the current position of the camera  
- */ 
+ */
 
 public class playerController : MonoBehaviour {
 
@@ -26,12 +26,16 @@ public class playerController : MonoBehaviour {
     RayCastScript forwardRay;
     RayCastScript backRay;
 
+    public GameObject MazeBody;
+    MazeBodyRotation mazeRotation;
+
     bool canMoveRight = false;
     bool canMoveLeft = false;
     bool canMoveForward = false;
     bool canMoveBack = false;
 
-    bool isMoving;
+    bool isMoving = false;
+    bool inJunction = true;
 
     float stepOffSet = 1f;   //the distance between each step (start and the end)
     float DownStep;
@@ -50,7 +54,7 @@ public class playerController : MonoBehaviour {
         Back
     };
     //all the variables to controll the player 
-    private float playerSpeed = 0.02f;   //the speed of the player also manipulates the animation speed of the player 
+    private float playerSpeed = 0.05f;   //the speed of the player also manipulates the animation speed of the player 
     private bool atEdge;    //to check if the player reached the edge of the maze(to trigger the camera movement and the player rotation)
     private Direction movementDireciton;
 
@@ -95,7 +99,7 @@ public class playerController : MonoBehaviour {
 
         MazeOffset = MazeSize / 2;
         DownStep = MazeOffset / 4;
-    
+        mazeRotation = MazeBody.GetComponent<MazeBodyRotation>();
 
     }
 	
@@ -110,7 +114,6 @@ public class playerController : MonoBehaviour {
         localBack = localForward * -1;
         localDown = transform.parent.InverseTransformDirection(transform.up) * -1;
 
-
         if (!atEdge)
         {
             Move();
@@ -119,7 +122,6 @@ public class playerController : MonoBehaviour {
         {
 
             ChangePlane();
-            RotateCamera();
             Debug.Log("changing plane");
         }
                
@@ -128,7 +130,7 @@ public class playerController : MonoBehaviour {
     void Move() //controls the movement of the player 
     {
         //Debug.Log(destinationFlag);
-        if (Input.GetAxis("Horizontal") > 0 && !isMoving)
+        if (Input.GetAxis("Horizontal") > 0 && !isMoving || movementDireciton == Direction.Right)
         {
             if (canMoveRight)
             {
@@ -152,7 +154,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Horizontal") < 0 && !isMoving)
+        else if(Input.GetAxis("Horizontal") < 0 && !isMoving || movementDireciton == Direction.Left)
         {
             if (canMoveLeft)
             {
@@ -176,7 +178,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Vertical") > 0 && !isMoving)
+        else if(Input.GetAxis("Vertical") > 0 && !isMoving || movementDireciton == Direction.Forward)
         {
             if (canMoveForward)
             {
@@ -200,7 +202,7 @@ public class playerController : MonoBehaviour {
                 }
             }
         }
-        else if(Input.GetAxis("Vertical") < 0 && !isMoving)
+        else if(Input.GetAxis("Vertical") < 0 && !isMoving || movementDireciton == Direction.Back)
         {
             if (canMoveBack)
             {
@@ -231,7 +233,7 @@ public class playerController : MonoBehaviour {
             destinationFlag = true;
             isMoving = false;
         }
-        else
+        else if(!mazeRotation.rotate)
         {
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, destination, playerSpeed);
         }
@@ -341,6 +343,7 @@ public class playerController : MonoBehaviour {
 
         for (int i = 0; i < 90; i++)
         {
+           
             if (movementDireciton == Direction.Right)
             {
                 transform.Rotate(RightRotation);
@@ -358,13 +361,28 @@ public class playerController : MonoBehaviour {
                 transform.Rotate(BackRotation);
             }
         }
-    }
-    void RotateCamera()
-    {
 
     }
-    void ChangeCameraPosition()
-    {
 
+    void ChangeCameraPosition() 
+    {
+        mazeRotation.rotate = true;
+
+        if (movementDireciton == Direction.Right)
+        {
+            mazeRotation.rotateDirection = localForward * 2;
+        }
+        else if (movementDireciton == Direction.Left)
+        {
+            mazeRotation.rotateDirection = localBack * 2;
+        }
+        else if (movementDireciton == Direction.Forward)
+        {
+            mazeRotation.rotateDirection = localLeft * 2;
+        }
+        else if (movementDireciton == Direction.Back)
+        {
+            mazeRotation.rotateDirection = localRight * 2;
+        }
     }
 }

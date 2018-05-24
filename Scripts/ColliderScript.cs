@@ -9,10 +9,6 @@ public class ColliderScript : MonoBehaviour {
         Debug.Log("initiating the colliders. . . ");
         hit = false;
     }
-    void Update()
-    {
-
-    }
     void OnTriggerEnter(Collider other)
     {
         Debug.Log("HIT : " + other.tag);

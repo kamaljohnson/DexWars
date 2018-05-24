@@ -2,9 +2,10 @@
 
 public class CameraScript : MonoBehaviour {
 
-    public GameObject player;
 
-	void Update () {
-        transform.LookAt(player.transform);
-	}
+    
+    public void changePosition(Vector3 Rotation)
+    {
+        transform.Rotate(Rotation);
+    }
 }
